@@ -18,11 +18,31 @@ function parseQuery() {
 }
 
 function toNumber(v) {
-  return Number.parseFloat(v) || 0;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
+
+  const raw = String(v ?? '').trim();
+  if (!raw) return 0;
+
+  const lastComma = raw.lastIndexOf(',');
+  const lastDot = raw.lastIndexOf('.');
+
+  let normalized = raw;
+  if (lastComma > lastDot) {
+    const intPart = raw.slice(0, lastComma).replace(/[.,\s]/g, '');
+    const fracPart = raw.slice(lastComma + 1).replace(/[^\d]/g, '');
+    normalized = `${intPart}.${fracPart}`;
+  } else if (lastDot > lastComma) {
+    const intPart = raw.slice(0, lastDot).replace(/[,\s]/g, '');
+    const fracPart = raw.slice(lastDot + 1).replace(/[^\d]/g, '');
+    normalized = `${intPart}.${fracPart}`;
+  }
+
+  const parsed = Number.parseFloat(normalized.replace(/[^\d.-]/g, ''));
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function formatDecimal(value, decimals = 1) {
-  return Number(value).toFixed(decimals).replace('.', ',');
+  return toNumber(value).toFixed(decimals).replace('.', ',');
 }
 
 function formatPercent(value) {
@@ -59,16 +79,17 @@ function entriesByActivity(entries) {
 function computeProgress(activity, entries) {
   const byId = entriesByActivity(entries);
   const items = byId[activity.id] || [];
+  const meta = toNumber(activity.meta);
 
   if (activity.tipo === 'max_daily_minutes') {
     const days = {};
     for (const e of items) days[e.date] = (days[e.date] || 0) + toNumber(e.value);
     const vals = Object.values(days);
-    const ok = vals.filter((v) => v <= activity.meta).length;
+    const ok = vals.filter((v) => v <= meta).length;
     const considered = vals.length;
     return {
       percent: considered === 0 ? 0 : (ok / considered) * 100,
-      realizedLabel: considered === 0 ? 'Sem registros' : `${ok}/${considered} dias <= ${activity.meta} min`,
+      realizedLabel: considered === 0 ? 'Sem registros' : `${ok}/${considered} dias <= ${formatByUnit(meta, 'min')} min`,
       raw: vals,
       total: considered,
     };
@@ -76,7 +97,7 @@ function computeProgress(activity, entries) {
 
   const total = items.reduce((s, e) => s + toNumber(e.value), 0);
   return {
-    percent: activity.meta > 0 ? Math.min((total / activity.meta) * 100, 100) : 0,
+    percent: meta > 0 ? Math.min((total / meta) * 100, 100) : 0,
     realizedLabel: `${formatByUnit(total, activity.unidade)} ${activity.unidade}`,
     raw: items,
     total,

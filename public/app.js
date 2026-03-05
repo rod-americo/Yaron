@@ -109,7 +109,7 @@ function ensureWeek(weekStart) {
 function fillActivityOptions() {
   const activities = [...state.data.activities].sort((a, b) => a.ordem - b.ordem);
   entryActivity.innerHTML = activities
-    .map((a) => `<option value="${a.id}">${a.nome} (${a.meta} ${a.unidade})</option>`)
+    .map((a) => `<option value="${a.id}">${a.nome} (${formatByUnit(a.meta, a.unidade)} ${a.unidade})</option>`)
     .join('');
 }
 
@@ -127,11 +127,31 @@ function entriesByActivity(entries) {
 }
 
 function toNumber(v) {
-  return Number.parseFloat(v) || 0;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
+
+  const raw = String(v ?? '').trim();
+  if (!raw) return 0;
+
+  const lastComma = raw.lastIndexOf(',');
+  const lastDot = raw.lastIndexOf('.');
+
+  let normalized = raw;
+  if (lastComma > lastDot) {
+    const intPart = raw.slice(0, lastComma).replace(/[.,\s]/g, '');
+    const fracPart = raw.slice(lastComma + 1).replace(/[^\d]/g, '');
+    normalized = `${intPart}.${fracPart}`;
+  } else if (lastDot > lastComma) {
+    const intPart = raw.slice(0, lastDot).replace(/[,\s]/g, '');
+    const fracPart = raw.slice(lastDot + 1).replace(/[^\d]/g, '');
+    normalized = `${intPart}.${fracPart}`;
+  }
+
+  const parsed = Number.parseFloat(normalized.replace(/[^\d.-]/g, ''));
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function formatDecimal(value, decimals = 1) {
-  return Number(value).toFixed(decimals).replace('.', ',');
+  return toNumber(value).toFixed(decimals).replace('.', ',');
 }
 
 function formatPercent(value) {
@@ -143,9 +163,17 @@ function formatByUnit(value, unit) {
   return formatDecimal(value, decimals);
 }
 
+function normalizeDecimalInput(raw) {
+  const clean = String(raw ?? '').replace(/[^\d,.-]/g, '').replace(/\./g, ',');
+  const firstComma = clean.indexOf(',');
+  if (firstComma < 0) return clean;
+  return `${clean.slice(0, firstComma + 1)}${clean.slice(firstComma + 1).replace(/,/g, '')}`;
+}
+
 function computeActivityProgress(activity, entries) {
   const byId = entriesByActivity(entries);
   const items = byId[activity.id] || [];
+  const meta = toNumber(activity.meta);
   const total = items.reduce((sum, e) => sum + toNumber(e.value), 0);
 
   if (activity.tipo === 'max_daily_minutes') {
@@ -154,18 +182,18 @@ function computeActivityProgress(activity, entries) {
       days[e.date] = (days[e.date] || 0) + toNumber(e.value);
     }
     const dayValues = Object.values(days);
-    const compliant = dayValues.filter((v) => v <= activity.meta).length;
+    const compliant = dayValues.filter((v) => v <= meta).length;
     const considered = dayValues.length || 0;
     const percent = considered === 0 ? 0 : Math.min((compliant / considered) * 100, 100);
     return {
-      total: considered ? `${compliant}/${considered} dias <= ${activity.meta} min` : 'Sem registros na semana',
+      total: considered ? `${compliant}/${considered} dias <= ${formatByUnit(meta, 'min')} min` : 'Sem registros na semana',
       percent,
     };
   }
 
-  const percent = activity.meta > 0 ? Math.min((total / activity.meta) * 100, 100) : 0;
+  const percent = meta > 0 ? Math.min((total / meta) * 100, 100) : 0;
   return {
-    total: `${formatByUnit(total, activity.unidade)}/${formatByUnit(activity.meta, activity.unidade)} ${activity.unidade}`,
+    total: `${formatByUnit(total, activity.unidade)}/${formatByUnit(meta, activity.unidade)} ${activity.unidade}`,
     percent,
   };
 }
@@ -226,14 +254,14 @@ function renderEntries(entries) {
     return;
   }
 
-  const activityName = Object.fromEntries(state.data.activities.map((a) => [a.id, a.nome]));
+  const activityById = Object.fromEntries(state.data.activities.map((a) => [a.id, a]));
   entriesTable.innerHTML = entries
     .map(
       (e, idx) => `
       <tr>
         <td>${e.date}</td>
-        <td>${activityName[e.activityId] || e.activityId}</td>
-        <td>${e.value}</td>
+        <td>${activityById[e.activityId]?.nome || e.activityId}</td>
+        <td>${formatByUnit(e.value, activityById[e.activityId]?.unidade || '')}</td>
         <td>${e.notes || ''}</td>
         <td><button class="remove-btn" data-remove="${idx}">Remover</button></td>
       </tr>`
@@ -322,13 +350,19 @@ weekInput.addEventListener('change', () => {
   scheduleAutoSave();
 });
 
+entryValue.addEventListener('input', () => {
+  const normalized = normalizeDecimalInput(entryValue.value);
+  if (normalized !== entryValue.value) entryValue.value = normalized;
+});
+
 entryForm.addEventListener('submit', (ev) => {
   ev.preventDefault();
+  const parsedValue = toNumber(entryValue.value);
   const w = weekData();
   w.entries.push({
     date: entryDate.value,
     activityId: entryActivity.value,
-    value: toNumber(entryValue.value),
+    value: parsedValue,
     notes: entryNotes.value.trim(),
   });
   entryValue.value = '';
