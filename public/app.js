@@ -141,10 +141,15 @@ function ensureWeek(weekStart) {
 }
 
 function fillActivityOptions() {
+  const previousSelection = entryActivity.value;
   const activities = [...state.data.activities].sort((a, b) => a.ordem - b.ordem);
   entryActivity.innerHTML = activities
     .map((a) => `<option value="${a.id}">${a.nome} (${formatByUnit(a.meta, a.unidade, a.id)} ${a.unidade})</option>`)
     .join('');
+  entryActivity.value = previousSelection;
+  if (!entryActivity.value && activities[0]) {
+    entryActivity.value = activities[0].id;
+  }
 }
 
 function weekData() {
@@ -367,6 +372,7 @@ function renderActions(w) {
 function render() {
   const w = weekData();
   const entries = [...w.entries].sort((a, b) => a.date.localeCompare(b.date));
+  fillActivityOptions();
   renderSummary(entries);
   renderEntries(entries);
   renderException(w);
