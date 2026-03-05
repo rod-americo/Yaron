@@ -2,6 +2,11 @@
 
 Aplicativo web (JavaScript + Node sem framework) para acompanhamento semanal, com persistência local em JSON.
 
+## Origem do nome
+
+**Yarion** nasce de **Yara** (minha filha) + **ion**: a parte que simboliza movimento.
+É um nome para lembrar que o app existe para manter constância, evolução e ação semana após semana.
+
 ## Stack
 
 - Backend: Node.js HTTP nativo (`server.js`)
@@ -63,10 +68,3 @@ Validação mínima no `POST`:
   - topo com `Semana | seletor | Voltar` na primeira linha
   - `Exportar PDF` abaixo
 - Servidor em `0.0.0.0:3080`.
-
-## Git
-
-Este repositório não deve versionar dados reais de acompanhamento.
-
-- versionar: `data/tracker.example.json`
-- ignorar: `data/tracker.json`
