@@ -107,7 +107,7 @@ function itemStatus(percent) {
 }
 
 async function loadState() {
-  const res = await fetch('/api/state');
+  const res = await fetch('api/state');
   return res.json();
 }
 
@@ -252,7 +252,7 @@ async function init() {
     renderRules(state, week, currentProgress);
     renderSpecial(state, week, currentProgress);
     renderEvidence(state, week);
-    window.history.replaceState(null, '', `/report.html?week=${week}`);
+    window.history.replaceState(null, '', `report.html?week=${week}`);
   }
 
   draw(weekStart);

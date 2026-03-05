@@ -46,7 +46,7 @@ function syncWeekDisplay() {
 }
 
 async function loadState() {
-  const res = await fetch('/api/state');
+  const res = await fetch('api/state');
   state.data = await res.json();
   state.weekStart = weekStartFor(today());
   weekInput.value = state.weekStart;
@@ -59,7 +59,7 @@ async function loadState() {
 }
 
 function updateReportLink() {
-  reportLink.href = `/report.html?week=${encodeURIComponent(state.weekStart)}`;
+  reportLink.href = `report.html?week=${encodeURIComponent(state.weekStart)}`;
 }
 
 async function persistState(showAlert = false) {
@@ -71,7 +71,7 @@ async function persistState(showAlert = false) {
   saveInFlight = true;
 
   try {
-    const res = await fetch('/api/state', {
+    const res = await fetch('api/state', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(state.data),

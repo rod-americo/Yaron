@@ -20,6 +20,7 @@ Use this workflow to make safe incremental changes in Yarion.
 
 ## Baseline Behavior To Preserve
 
+- App must be mount-path agnostic: work when hosted at `/`, `/yaron/`, `/apps/yaron/`, or any other subpath behind reverse proxy.
 - Autosave persists state to JSON without manual save button.
 - Weekly summary cards in two columns on desktop.
 - Extra real-time card: `Consistência` (read-only, derived from entries).
@@ -48,6 +49,16 @@ Use this workflow to make safe incremental changes in Yarion.
 
 ## Quick Change Checklist
 
+- If touching HTML/JS/CSS/manifest paths, keep internal references relative (never root-anchored).
+- Verify no root-anchored internal paths remain:
+  - `href="/`
+  - `src="/`
+  - `fetch("/`
+  - `url("/`
+- Prefer `<base href="./">` in HTML pages when navigation is present.
+- Keep manifest entries relative:
+  - `start_url: "./"`
+  - `icons[].src` without leading `/`
 - If touching formatting, validate both app and report formatters.
 - If touching layout/CSS, check breakpoints and report header arrangement.
 - If touching data model, keep API payload compatibility (`activities` and `weeks` required).

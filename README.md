@@ -53,6 +53,9 @@ npm start
 
 ```text
 .
+├── .skills/
+│   └── yarion-maintenance/
+│       └── SKILL.md
 ├── data/
 │   ├── tracker.example.json
 │   └── tracker.json              # ignorado no Git
@@ -90,4 +93,4 @@ Validação mínima:
 
 ## Licença
 
-Uso privado.
+[MIT](./LICENSE)

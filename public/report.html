@@ -8,11 +8,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Yarion" />
-    <link rel="manifest" href="/site.webmanifest" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
-    <link rel="stylesheet" href="/styles.css" />
+    <base href="./" />
+    <link rel="manifest" href="site.webmanifest" />
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header class="topbar">
@@ -24,7 +25,7 @@
           <input id="reportWeekCompact" class="week-compact" type="text" readonly />
         </div>
         <div class="topbar-buttons">
-          <a class="btn-link" href="/">Voltar</a>
+          <a class="btn-link" href="./">Voltar</a>
         </div>
         <div class="report-actions-secondary">
           <button id="printBtn" type="button">Exportar PDF</button>
@@ -73,6 +74,6 @@
       </section>
     </main>
 
-    <script src="/report.js"></script>
+    <script src="report.js"></script>
   </body>
 </html>
