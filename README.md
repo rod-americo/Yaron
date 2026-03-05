@@ -12,7 +12,7 @@ Aplicativo web (JavaScript + Node sem framework) para acompanhamento semanal, co
 ## Executar localmente
 
 ```bash
-cd /Users/rodrigo/Yaron
+cd Yaron
 npm start
 ```
 

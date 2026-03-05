@@ -44,6 +44,7 @@ Use this workflow to make safe incremental changes in Yarion.
    - no obvious JS syntax errors
 4. Report exactly which files changed and the concrete technical effect.
 5. Never commit real user data from `data/tracker.json`; use `data/tracker.example.json` for tracked examples.
+6. Use semantic commits (Conventional Commits): `type(scope): summary` in imperative English, max 72 chars in subject. Prefer `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `chore`.
 
 ## Quick Change Checklist
 
