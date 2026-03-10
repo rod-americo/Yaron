@@ -405,6 +405,8 @@ entryForm.addEventListener('submit', (ev) => {
     value: parsedValue,
     notes: entryNotes.value.trim(),
   });
+
+  entryDate.value = today();
   entryValue.value = '';
   entryNotes.value = '';
   render();

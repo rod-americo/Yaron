@@ -13,6 +13,7 @@ Aplicativo web de acompanhamento semanal com frontend em JavaScript puro e backe
 - Resumo semanal em cards (2 colunas no desktop).
 - Card extra de **Consistência** em tempo real.
 - Relatório semanal com exportação para PDF.
+- Múltiplas entradas por atividade no mesmo dia e na mesma semana.
 - PWA com manifest e ícones.
 - API simples para leitura e escrita do estado (`/api/state`).
 
