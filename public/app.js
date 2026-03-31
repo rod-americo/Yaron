@@ -125,8 +125,8 @@ async function persistState(showAlert = false) {
       body: JSON.stringify(state.data),
     });
 
-    if (!res.ok) throw new Error('Falha ao salvar JSON.');
-    if (showAlert) alert('Dados salvos em data/tracker.json');
+    if (!res.ok) throw new Error('Falha ao salvar no banco SQLite.');
+    if (showAlert) alert('Dados salvos em data/tracker.db');
   } catch (err) {
     if (showAlert) alert(err.message);
   } finally {

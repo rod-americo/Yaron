@@ -1,6 +1,6 @@
 # Yarion
 
-Aplicativo web de acompanhamento semanal com frontend em JavaScript puro e backend Node.js sem framework, com persistência local em JSON.
+Aplicativo web de acompanhamento semanal com frontend em JavaScript puro e backend Python sem framework, com persistência local em SQLite3.
 
 ## Nome do projeto
 
@@ -8,7 +8,7 @@ Aplicativo web de acompanhamento semanal com frontend em JavaScript puro e backe
 
 ## Funcionalidades
 
-- Autosave em `data/tracker.json`.
+- Autosave em `data/tracker.db`.
 - Atualização automática dos dados a cada 30 segundos no painel e no relatório.
 - Resumo semanal em cards (2 colunas no desktop).
 - Card extra de **Consistência** em tempo real.
@@ -16,6 +16,7 @@ Aplicativo web de acompanhamento semanal com frontend em JavaScript puro e backe
 - Múltiplas entradas por atividade no mesmo dia e na mesma semana.
 - PWA com manifest e ícones.
 - API simples para leitura e escrita do estado (`/api/state`).
+- Migração automática e não destrutiva de `data/tracker.json` para SQLite no primeiro boot.
 
 ## Regras de exibição atuais
 
@@ -28,25 +29,22 @@ Aplicativo web de acompanhamento semanal com frontend em JavaScript puro e backe
 
 ## Stack
 
-- Node.js (HTTP nativo)
+- Python 3 (HTTP nativo)
+- SQLite3
 - HTML + CSS + JavaScript (vanilla)
-- Persistência em arquivo JSON local
+- Persistência em banco SQLite local
 
 ## Como executar
 
-### 1) Instalar dependências
+### 1) Iniciar servidor
 
 ```bash
-npm install
+python3 app.py
 ```
 
-### 2) Iniciar servidor
+Na primeira execução, se existir `data/tracker.json`, o app importa os dados para `data/tracker.db` sem apagar o arquivo legado.
 
-```bash
-npm start
-```
-
-### 3) Acessar
+### 2) Acessar
 
 - Local: `http://localhost:3080`
 - Rede local: `http://<ip-da-maquina>:3080`
@@ -58,9 +56,11 @@ npm start
 ├── .skills/
 │   └── yarion-maintenance/
 │       └── SKILL.md
+├── app.py
 ├── data/
+│   ├── tracker.db                # ignorado no Git
 │   ├── tracker.example.json
-│   └── tracker.json              # ignorado no Git
+│   └── tracker.json              # legado/local, ignorado no Git
 ├── public/
 │   ├── icons/
 │   ├── app.js
@@ -69,9 +69,9 @@ npm start
 │   ├── report.html
 │   ├── site.webmanifest
 │   └── styles.css
-├── package-lock.json
-├── server.js
-└── package.json
+├── server.js                     # legado da versão Node.js
+├── LICENSE
+└── README.md
 ```
 
 ## API
@@ -82,17 +82,19 @@ Retorna o estado completo do acompanhamento.
 
 ### `POST /api/state`
 
-Salva o estado completo enviado no body (JSON).
+Salva o estado completo enviado no body (JSON) no banco SQLite.
 
 Validação mínima:
 
 - body deve ser objeto
 - deve conter `activities` e `weeks`
 
-## Dados e versionamento
+## Migração e dados
 
-- `data/tracker.json`: dados reais locais (não versionado).
+- `data/tracker.db`: base SQLite usada pelo app (não versionada).
+- `data/tracker.json`: fonte legada local importada automaticamente quando o banco está vazio.
 - `data/tracker.example.json`: exemplo limpo versionado no repositório.
+- `server.js`: referência legada da implementação anterior em Node.js, mantida fora do fluxo principal atual.
 
 ## Licença
 

@@ -7,6 +7,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Python
+__pycache__/
+*.py[cod]
+
 # OS/editor
 .DS_Store
 .vscode/
@@ -14,6 +18,9 @@ yarn-error.log*
 
 # Local state (do not commit real user data)
 data/tracker.json
+data/tracker.db
+data/tracker.db-shm
+data/tracker.db-wal
 
 # Temp
 .tmp/
