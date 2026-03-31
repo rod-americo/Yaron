@@ -1,6 +1,6 @@
 # Yarion
 
-Aplicativo web de acompanhamento semanal com frontend em JavaScript puro e backend Python sem framework, com persistência local em SQLite3.
+Aplicativo web de acompanhamento semanal com frontend em JavaScript puro e backend Python sem framework. A persistência local do app é feita em SQLite.
 
 ## Nome do projeto
 
@@ -15,8 +15,8 @@ Aplicativo web de acompanhamento semanal com frontend em JavaScript puro e backe
 - Relatório semanal com exportação para PDF.
 - Múltiplas entradas por atividade no mesmo dia e na mesma semana.
 - PWA com manifest e ícones.
-- API simples para leitura e escrita do estado (`/api/state`).
-- Migração automática e não destrutiva de `data/tracker.json` para SQLite no primeiro boot.
+- API simples para leitura e escrita do estado em `/api/state`.
+- Importação automática de uma base legada no primeiro boot, quando aplicável.
 
 ## Regras de exibição atuais
 
@@ -32,7 +32,7 @@ Aplicativo web de acompanhamento semanal com frontend em JavaScript puro e backe
 - Python 3 (HTTP nativo)
 - SQLite3
 - HTML + CSS + JavaScript (vanilla)
-- Persistência em banco SQLite local
+- Persistência local em SQLite
 
 ## Como executar
 
@@ -42,20 +42,29 @@ Aplicativo web de acompanhamento semanal com frontend em JavaScript puro e backe
 python3 app.py
 ```
 
-Na primeira execução, se existir `data/tracker.json`, o app importa os dados para `data/tracker.db` sem apagar o arquivo legado.
+Por padrão, o servidor sobe em `0.0.0.0:3080`.
 
 ### 2) Acessar
 
 - Local: `http://localhost:3080`
 - Rede local: `http://<ip-da-maquina>:3080`
 
-## Estrutura do projeto
+## Persistência
+
+- O banco principal do app é `data/tracker.db`.
+- Toda leitura e escrita do estado da aplicação passa pelo backend Python e é persistida no SQLite.
+- Os arquivos `data/tracker.db-shm` e `data/tracker.db-wal` podem aparecer localmente como artefatos normais do SQLite.
+
+## Compatibilidade legada
+
+- Se existir um arquivo `data/tracker.json` e o banco ainda estiver vazio, o app importa esse conteúdo no primeiro boot.
+- O arquivo legado não é a fonte de persistência atual.
+- `data/tracker.example.json` permanece apenas como referência de estrutura de dados.
+
+## Estrutura principal
 
 ```text
 .
-├── .skills/
-│   └── yarion-maintenance/
-│       └── SKILL.md
 ├── app.py
 ├── data/
 │   ├── tracker.db                # ignorado no Git
@@ -69,7 +78,6 @@ Na primeira execução, se existir `data/tracker.json`, o app importa os dados p
 │   ├── report.html
 │   ├── site.webmanifest
 │   └── styles.css
-├── server.js                     # legado da versão Node.js
 ├── LICENSE
 └── README.md
 ```
@@ -82,19 +90,12 @@ Retorna o estado completo do acompanhamento.
 
 ### `POST /api/state`
 
-Salva o estado completo enviado no body (JSON) no banco SQLite.
+Recebe o estado completo da aplicação e persiste esse estado no SQLite.
 
 Validação mínima:
 
 - body deve ser objeto
 - deve conter `activities` e `weeks`
-
-## Migração e dados
-
-- `data/tracker.db`: base SQLite usada pelo app (não versionada).
-- `data/tracker.json`: fonte legada local importada automaticamente quando o banco está vazio.
-- `data/tracker.example.json`: exemplo limpo versionado no repositório.
-- `server.js`: referência legada da implementação anterior em Node.js, mantida fora do fluxo principal atual.
 
 ## Licença
 
